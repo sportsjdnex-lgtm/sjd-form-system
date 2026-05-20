@@ -1,14 +1,21 @@
 "use client";
-import { storage } from "../lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import { useState } from "react";
-import { db } from "../lib/firebase";
+
+import { db, storage } from "../lib/firebase";
+
 import { collection, addDoc } from "firebase/firestore";
 
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 export default function SJDFormManagementSystem() {
+
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+
+  const [customerName, setCustomerName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [teamName, setTeamName] = useState("");
+  const [quantity, setQuantity] = useState("");
 
   const [orderType, setOrderType] = useState("");
   const [fabric, setFabric] = useState("");
@@ -16,70 +23,10 @@ export default function SJDFormManagementSystem() {
   const [collarType, setCollarType] = useState("");
   const [sleevesBottomType, setSleevesBottomType] = useState("");
   const [dispatchDate, setDispatchDate] = useState("");
+
   const [notes, setNotes] = useState("");
-  const [selectedFile, setSelectedFile] = useState<any>(null);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    setLoading(true);
-    setSuccessMessage("");
-
-    try {
-      let fileUrl = "";
-
-if (selectedFile) {
-  const storageRef = ref(
-    storage,
-    `orders/${Date.now()}-${selectedFile.name}`
-  );
-
-  await uploadBytes(storageRef, selectedFile);
-
-  fileUrl = await getDownloadURL(storageRef);
-}
-      await addDoc(collection(db, "orders"), {
-        orderType,
-        fabric,
-        sleevesType,
-        collarType,
-        sleevesBottomType,
-        dispatchDate,
-        notes,
-        status: "Pending",
-        fileUrl,
-fileName: selectedFile?.name || "",
-        createdAt: new Date(),
-      });
-
-      // Reset Form
-      setOrderType("");
-      setFabric("");
-      setSleevesType("");
-      setCollarType("");
-      setSleevesBottomType("");
-      setDispatchDate("");
-      setNotes("");
-      setSelectedFile(null);
-
-      setLoading(false);
-
-      // Success Toast
-      setSuccessMessage("✅ Order Submitted Successfully!");
-
-      // Auto Remove Toast
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-
-    } catch (error) {
-      console.error(error);
-
-      setLoading(false);
-
-      setSuccessMessage("❌ Error submitting order");
-    }
-  };
+  const [designFile, setDesignFile] = useState<any>(null);
 
   const orderTypes = [
     "Front Sublimation",
@@ -98,7 +45,7 @@ fileName: selectedFile?.name || "",
     "Jaquard",
     "India Jaquard",
     "Zigzag / Lehariya",
-    "Reebook Net",
+    "Reebok Net",
     "Multiple Fabrics",
     "Feelgood",
   ];
@@ -111,8 +58,8 @@ fileName: selectedFile?.name || "",
   ];
 
   const collarTypes = [
-    "Regular Collar with Buttons",
-    "Regular Collar with Zip",
+    "Regular Collar with buttons",
+    "Regular Collar with zip",
     "Rib collar with buttons",
     "Rib collar with zip",
     "Stand collar with zip",
@@ -123,281 +70,393 @@ fileName: selectedFile?.name || "",
     "Regular Collar without buttons",
   ];
 
-  const sleevesBottom = [
+  const sleevesBottoms = [
     "Half sleeves 1 in patti",
     "piping 1 in up in bottom",
     "Full sleeves 1 in Patti",
     "Full sleeves 2 in rib",
   ];
 
-  return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Success Toast */}
-      {successMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl font-bold animate-bounce">
-          {successMessage}
-        </div>
-      )}
+  const handleSubmit = async (e: any) => {
 
-      {/* Header */}
-      <header className="bg-gradient-to-r from-slate-950 to-blue-900 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-2xl font-black">
-              SJD
-            </div>
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+
+      let fileURL = "";
+
+      if (designFile) {
+
+        const storageRef = ref(
+          storage,
+          `designs/${Date.now()}-${designFile.name}`
+        );
+
+        await uploadBytes(storageRef, designFile);
+
+        fileURL = await getDownloadURL(storageRef);
+      }
+
+      await addDoc(collection(db, "orders"), {
+
+        orderNumber: `SJD-${Date.now()}`,
+
+        customerName,
+        mobileNumber,
+        teamName,
+        quantity,
+
+        orderType,
+        fabric,
+        sleevesType,
+        collarType,
+        sleevesBottomType,
+        dispatchDate,
+
+        notes,
+
+        fileURL,
+
+        status: "Pending",
+
+        createdAt: new Date(),
+      });
+
+      alert("Order Submitted Successfully 🔥");
+
+      setCustomerName("");
+      setMobileNumber("");
+      setTeamName("");
+      setQuantity("");
+
+      setOrderType("");
+      setFabric("");
+      setSleevesType("");
+      setCollarType("");
+      setSleevesBottomType("");
+      setDispatchDate("");
+
+      setNotes("");
+
+      setDesignFile(null);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Error submitting order");
+
+    }
+
+    setLoading(false);
+  };
+
+  return (
+
+    <div className="min-h-screen bg-gray-100 p-4 md:p-10">
+
+      <div className="max-w-7xl mx-auto">
+
+        <div className="bg-gradient-to-r from-black to-blue-900 rounded-3xl p-10 text-white shadow-2xl mb-10">
+
+          <div className="flex justify-between items-center flex-wrap gap-4">
 
             <div>
-              <h1 className="text-2xl md:text-3xl font-black tracking-wide">
-                SJD Form Management System
+              <h1 className="text-4xl md:text-5xl font-bold mb-3">
+                Sports Jersey Order Management
               </h1>
 
-              <p className="text-sm text-slate-300">
-                Premium Sports Jersey Order Platform
+              <p className="text-lg text-gray-300">
+                Professional mobile-friendly system for jersey order
+                submission, design uploads, dispatch management, and admin
+                tracking.
               </p>
             </div>
+
+            <a
+              href="/dashboard"
+              className="bg-white text-blue-900 font-bold px-6 py-3 rounded-xl"
+            >
+              Admin Dashboard
+            </a>
+
           </div>
 
-          <button className="bg-white text-slate-900 px-5 py-2 rounded-xl font-semibold hover:scale-105 transition-all">
-            Admin Login
-          </button>
         </div>
-      </header>
 
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 py-10">
-        <div className="bg-gradient-to-br from-blue-900 to-slate-950 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
-          <div className="max-w-3xl">
-            <h2 className="text-4xl md:text-6xl font-black leading-tight">
-              Sports Jersey Order Management
-            </h2>
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10">
 
-            <p className="mt-5 text-lg text-slate-300 leading-relaxed">
-              Professional mobile-friendly system for jersey order submission,
-              design uploads, dispatch management, and admin tracking.
-            </p>
+          <div className="flex justify-between items-center mb-10 flex-wrap gap-4">
 
-            <div className="mt-8 flex flex-wrap gap-4">
-              <button
-                type="button"
-                className="bg-white text-slate-900 px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all"
-              >
-                Start New Order
-              </button>
-
-              <button
-                type="button"
-                className="border border-white/20 px-6 py-3 rounded-2xl font-semibold hover:bg-white/10 transition-all"
-              >
-                View Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Form */}
-      <section className="max-w-5xl mx-auto px-4 pb-20">
-        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 border border-slate-200">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
             <div>
-              <h3 className="text-3xl font-black text-slate-900">
-                New Jersey Order Form
-              </h3>
 
-              <p className="text-slate-500 mt-2">
+              <h2 className="text-4xl font-bold text-gray-900 mb-2">
+                New Jersey Order Form
+              </h2>
+
+              <p className="text-gray-500">
                 Fill all required details carefully.
               </p>
+
             </div>
 
-            <div className="bg-blue-100 text-blue-900 px-4 py-2 rounded-xl font-bold">
-              Order ID: SJD-2026-0001
+            <div className="bg-blue-100 text-blue-900 px-5 py-3 rounded-2xl font-bold">
+              Order ID: SJD-{Date.now()}
             </div>
+
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            {/* Order Type */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Order Type
-              </label>
+          <form onSubmit={handleSubmit}>
 
-              <select
-                value={orderType}
-                onChange={(e) => setOrderType(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Order Type</option>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
-                {orderTypes.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="block font-semibold mb-2">
+                  Customer Name
+                </label>
+
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Enter Customer Name"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Mobile Number
+                </label>
+
+                <input
+                  type="text"
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  placeholder="Enter Mobile Number"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Team Name
+                </label>
+
+                <input
+                  type="text"
+                  value={teamName}
+                  onChange={(e) => setTeamName(e.target.value)}
+                  placeholder="Enter Team Name"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Quantity
+                </label>
+
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Enter Quantity"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                />
+              </div>
+
             </div>
 
-            {/* Fabric */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Select Fabric
-              </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              <select
-                value={fabric}
-                onChange={(e) => setFabric(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Fabric</option>
+              <div>
+                <label className="block font-semibold mb-2">
+                  Order Type
+                </label>
 
-                {fabrics.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+                <select
+                  value={orderType}
+                  onChange={(e) => setOrderType(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                >
+
+                  <option value="">Select Order Type</option>
+
+                  {orderTypes.map((item, index) => (
+                    <option key={index}>{item}</option>
+                  ))}
+
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Select Fabric
+                </label>
+
+                <select
+                  value={fabric}
+                  onChange={(e) => setFabric(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                >
+
+                  <option value="">Select Fabric</option>
+
+                  {fabrics.map((item, index) => (
+                    <option key={index}>{item}</option>
+                  ))}
+
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Sleeves Type
+                </label>
+
+                <select
+                  value={sleevesType}
+                  onChange={(e) => setSleevesType(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                >
+
+                  <option value="">Select Sleeves Type</option>
+
+                  {sleevesTypes.map((item, index) => (
+                    <option key={index}>{item}</option>
+                  ))}
+
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Collar Type
+                </label>
+
+                <select
+                  value={collarType}
+                  onChange={(e) => setCollarType(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                >
+
+                  <option value="">Select Collar Type</option>
+
+                  {collarTypes.map((item, index) => (
+                    <option key={index}>{item}</option>
+                  ))}
+
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Sleeves Bottom
+                </label>
+
+                <select
+                  value={sleevesBottomType}
+                  onChange={(e) => setSleevesBottomType(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                >
+
+                  <option value="">Select Sleeves Bottom</option>
+
+                  {sleevesBottoms.map((item, index) => (
+                    <option key={index}>{item}</option>
+                  ))}
+
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-2">
+                  Dispatch Date
+                </label>
+
+                <input
+                  type="date"
+                  value={dispatchDate}
+                  onChange={(e) => setDispatchDate(e.target.value)}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4"
+                  required
+                />
+              </div>
+
             </div>
 
-            {/* Sleeves Type */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Sleeves Type
-              </label>
+            <div className="mt-10">
 
-              <select
-                value={sleevesType}
-                onChange={(e) => setSleevesType(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Sleeves Type</option>
-
-                {sleevesTypes.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Collar Type */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Collar Type
-              </label>
-
-              <select
-                value={collarType}
-                onChange={(e) => setCollarType(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Collar Type</option>
-
-                {collarTypes.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sleeves Bottom */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Sleeves Bottom
-              </label>
-
-              <select
-                value={sleevesBottomType}
-                onChange={(e) => setSleevesBottomType(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Sleeves Bottom</option>
-
-                {sleevesBottom.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Dispatch Date */}
-            <div className="space-y-2">
-              <label className="font-bold text-slate-800">
-                Dispatch Date
-              </label>
-
-              <input
-                type="date"
-                value={dispatchDate}
-                onChange={(e) => setDispatchDate(e.target.value)}
-                required
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Upload */}
-            <div className="md:col-span-2 space-y-2">
-              <label className="font-bold text-slate-800">
+              <label className="block font-semibold mb-3">
                 Required Design Upload
               </label>
 
-              <div className="border-2 border-dashed border-slate-300 rounded-3xl p-10 text-center bg-slate-50 hover:border-blue-500 transition-all">
-                <div className="text-5xl mb-4">📁</div>
+              <div className="border-2 border-dashed border-blue-200 rounded-3xl p-10 text-center">
 
-                <h4 className="text-xl font-bold text-slate-900">
+                <div className="text-6xl mb-4">📁</div>
+
+                <h3 className="text-3xl font-bold mb-2">
                   Upload Design Files
-                </h4>
+                </h3>
 
-                <p className="text-slate-500 mt-2">
+                <p className="text-gray-500 mb-6">
                   JPG, PNG, PDF, DOC supported.
                 </p>
 
                 <input
-  type="file"
-  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-  onChange={(e: any) => setSelectedFile(e.target.files[0])}
-  className="mt-6 block mx-auto"
-/>
+                  type="file"
+                  onChange={(e: any) =>
+                    setDesignFile(e.target.files[0])
+                  }
+                  className="w-full"
+                />
+
               </div>
+
             </div>
 
-            {/* Notes */}
-            <div className="md:col-span-2 space-y-2">
-              <label className="font-bold text-slate-800">
+            <div className="mt-10">
+
+              <label className="block font-semibold mb-2">
                 Additional Notes
               </label>
 
               <textarea
-                rows={5}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
+                rows={5}
                 placeholder="Write additional requirements here..."
-                className="w-full border border-slate-300 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              ></textarea>
+                className="w-full border border-gray-300 rounded-2xl px-4 py-4"
+              />
+
             </div>
 
-            {/* Submit */}
-            <div className="md:col-span-2 pt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-900 to-slate-950 text-white py-5 rounded-2xl text-xl font-black hover:scale-[1.01] transition-all shadow-2xl disabled:opacity-70"
-              >
-                {loading ? "Submitting..." : "Submit Jersey Order"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-10 bg-gradient-to-r from-blue-800 to-black text-white py-5 rounded-2xl text-2xl font-bold hover:opacity-90 transition"
+            >
+
+              {loading ? "Submitting..." : "Submit Jersey Order"}
+
+            </button>
+
           </form>
+
         </div>
-      </section>
+
+      </div>
+
     </div>
   );
 }
