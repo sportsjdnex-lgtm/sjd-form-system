@@ -99,9 +99,11 @@ export default function SJDFormManagementSystem() {
         fileURL = await getDownloadURL(storageRef);
       }
 
+      const orderNumber = `SJD-${Date.now()}`;
+
       await addDoc(collection(db, "orders"), {
 
-        orderNumber: `SJD-${Date.now()}`,
+        orderNumber,
 
         customerName,
         mobileNumber,
@@ -164,22 +166,24 @@ export default function SJDFormManagementSystem() {
           <div className="flex justify-between items-center flex-wrap gap-4">
 
             <div>
+
               <h1 className="text-4xl md:text-5xl font-bold mb-3">
                 Sports Jersey Order Management
               </h1>
 
               <p className="text-lg text-gray-300">
                 Professional mobile-friendly system for jersey order
-                submission, design uploads, dispatch management, and admin
-                tracking.
+                submission, design uploads, dispatch management,
+                and admin tracking.
               </p>
+
             </div>
 
             <a
               href="/dashboard"
               className="bg-white text-blue-900 font-bold px-6 py-3 rounded-xl"
             >
-              Admin Dashboard
+              View Dashboard
             </a>
 
           </div>
@@ -203,7 +207,7 @@ export default function SJDFormManagementSystem() {
             </div>
 
             <div className="bg-blue-100 text-blue-900 px-5 py-3 rounded-2xl font-bold">
-              Order ID: SJD-{Date.now()}
+              Order ID: SJD-2026-0001
             </div>
 
           </div>
@@ -213,6 +217,7 @@ export default function SJDFormManagementSystem() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Customer Name
                 </label>
@@ -225,9 +230,11 @@ export default function SJDFormManagementSystem() {
                   className="w-full border border-gray-300 rounded-xl px-4 py-4"
                   required
                 />
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Mobile Number
                 </label>
@@ -240,9 +247,11 @@ export default function SJDFormManagementSystem() {
                   className="w-full border border-gray-300 rounded-xl px-4 py-4"
                   required
                 />
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Team Name
                 </label>
@@ -254,9 +263,11 @@ export default function SJDFormManagementSystem() {
                   placeholder="Enter Team Name"
                   className="w-full border border-gray-300 rounded-xl px-4 py-4"
                 />
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Quantity
                 </label>
@@ -268,6 +279,7 @@ export default function SJDFormManagementSystem() {
                   placeholder="Enter Quantity"
                   className="w-full border border-gray-300 rounded-xl px-4 py-4"
                 />
+
               </div>
 
             </div>
@@ -275,6 +287,7 @@ export default function SJDFormManagementSystem() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Order Type
                 </label>
@@ -293,9 +306,11 @@ export default function SJDFormManagementSystem() {
                   ))}
 
                 </select>
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Select Fabric
                 </label>
@@ -314,9 +329,11 @@ export default function SJDFormManagementSystem() {
                   ))}
 
                 </select>
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Sleeves Type
                 </label>
@@ -335,9 +352,11 @@ export default function SJDFormManagementSystem() {
                   ))}
 
                 </select>
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Collar Type
                 </label>
@@ -356,9 +375,11 @@ export default function SJDFormManagementSystem() {
                   ))}
 
                 </select>
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Sleeves Bottom
                 </label>
@@ -377,9 +398,11 @@ export default function SJDFormManagementSystem() {
                   ))}
 
                 </select>
+
               </div>
 
               <div>
+
                 <label className="block font-semibold mb-2">
                   Dispatch Date
                 </label>
@@ -391,6 +414,7 @@ export default function SJDFormManagementSystem() {
                   className="w-full border border-gray-300 rounded-xl px-4 py-4"
                   required
                 />
+
               </div>
 
             </div>
